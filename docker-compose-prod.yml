@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  django:
+      container_name: django-webserver
+      build: .
+      command: poetry run gunicorn project_name.wsgi:application --bind 0.0.0.0:8000
+      volumes:
+        - .:/app
+      ports:
+        - "80:8000"  # Map port 80 of host to port 80 of container
+      environment:
+        - DJANGO_ENV=production
+        - SECRET_KEY=your_secret_key
+        - DB_NAME=dj-jrd
+        - DB_USER=postgres
+        - DB_PASSWORD=Pa$$w0rd
+        - DB_HOST=localhost
+        - DB_PORT=5432
+      depends_on:
+        - postgres
+      networks:
+        - dj
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    environment:
+      POSTGRES_DB: dj-jrd
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pa$$w0rd
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dj
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: kokoy103@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 123456789
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - dj
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  dj:
