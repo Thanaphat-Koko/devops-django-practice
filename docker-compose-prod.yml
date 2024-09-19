@@ -11,7 +11,7 @@ services:
         - "80:8000"  # Map port 80 of host to port 80 of container
       environment:
         - DJANGO_ENV=production
-        - SECRET_KEY=your_secret_key
+        - SECRET_KEY=9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m
         - DB_NAME=dj-jrd
         - DB_USER=postgres
         - DB_PASSWORD=Pa$$w0rd
@@ -30,7 +30,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Pa$$w0rd
     ports:
-      - 127.0.0.1:5432:5432
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
