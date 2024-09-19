@@ -12,7 +12,8 @@ WORKDIR /app
 COPY . /app/
 
 # Install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends gcc
+RUN apt-get update && apt-get install -y \
+    libpq-dev gcc python3-dev build-essential
 RUN pip install poetry
 RUN poetry install
 
