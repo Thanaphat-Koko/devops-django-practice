@@ -41,13 +41,13 @@ services:
 
   nginx:
     build: ./nginx
+    container_name: nginx
     ports:
       - "80:80"
     volumes:
       - static_volume:/usr/share/nginx/html/static
     depends_on:
       - django
-    restart: always
     networks:
       - dj
 
