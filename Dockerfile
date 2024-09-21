@@ -17,6 +17,6 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN poetry install
-RUN poetry run python manage.py migrate
+# RUN poetry run python manage.py migrate
 RUN poetry run python manage.py collectstatic --noinput
 
