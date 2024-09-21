@@ -14,8 +14,9 @@ COPY . /app/
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     libpq-dev gcc python3-dev build-essential
-RUN pip install poetry
-RUN poetry install
 
-# Run migrations, collect static files and start the Django server with Gunicorn bound to port 80
-CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput"]
+RUN pip install --no-cache-dir -r requirements.txt
+RUN poetry install
+RUN poetry run python manage.py migrate
+RUN poetry run python manage.py collectstatic --noinput
+

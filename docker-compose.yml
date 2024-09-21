@@ -3,21 +3,22 @@ version: '3.8'
 services:
   django:
       container_name: django-webserver
-      build: .
+      build: ./docker-django
       command: poetry run gunicorn project_jrd.wsgi:application --bind 0.0.0.0:8000
       volumes:
-        - .:/app
-      ports:
-        - "80:8000"  # Map port 80 of host to port 80 of container
+        - static_volume:/app/static
+      expose:
+        - "8000"   # Map port 80 of host to port 80 of container
       environment:
         - DJANGO_ENV=production
-        - PRODUCTION_HOST="192.168.10.10"
+        - PRODUCTION_HOST=192.168.10.10
         - SECRET_KEY=9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m
         - DB_NAME=dj-jrd
         - DB_USER=postgres
         - DB_PASSWORD=Pa$$w0rd
         - DB_HOST=localhost
         - DB_PORT=5432
+      restart: always
       depends_on:
         - postgres
       networks:
@@ -32,29 +33,26 @@ services:
       POSTGRES_PASSWORD: Pa$$w0rd
     ports:
       - 127.0.0.1:5432:5432
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - dj
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: kokoy103@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: 123456789
+  nginx:
+    build: ./nginx
     ports:
-      - "5050:80"
-    depends_on:
-      - postgres
+      - "80:80"
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - static_volume:/usr/share/nginx/html/static
+    depends_on:
+      - django
+    restart: always
     networks:
       - dj
 
 volumes:
   postgres_data:
-  pgadmin_data:
-
+  static_volume:
 networks:
   dj:
