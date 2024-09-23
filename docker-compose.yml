@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  django:
+      container_name: django-webserver
+      build: .
+      command: poetry run gunicorn project_jrd.wsgi:application --bind 0.0.0.0:8000
+      volumes:
+        - static_volume:/app/static
+      expose:
+        - "8000"
+      environment:
+        - PRODUCTION_HOST=*
+        - SECRET_KEY=9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m
+        - DB_NAME=dj-jrd
+        - DB_USER=dj-postgres
+        - DB_PASSWORD=Pa$$w0rd
+        - DB_HOST=postgres
+        - DB_PORT=5432
+      restart: always
+      depends_on:
+        - postgres
+      networks:
+        - dj
+
+  postgres:
+    image: postgres:14
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: dj-jrd
+      POSTGRES_USER: dj-postgres
+      POSTGRES_PASSWORD: Pa$$w0rd
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dj
+
+  nginx:
+    build: ./nginx
+    container_name: nginx-webserver
+    ports:
+      - "80:80"
+    restart: always
+    volumes:
+      - static_volume:/usr/share/nginx/html/static
+    depends_on:
+      - django
+    networks:
+      - dj
+
+volumes:
+  postgres_data:
+  static_volume:
+networks:
+  dj:
