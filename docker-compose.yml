@@ -14,7 +14,7 @@ services:
         - PRODUCTION_HOST=192.168.10.10
         - SECRET_KEY=9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m
         - DB_NAME=dj-jrd
-        - DB_USER=postgres
+        - DB_USER=dj-postgres
         - DB_PASSWORD=Pa$$w0rd
         - DB_HOST=localhost
         - DB_PORT=5432
@@ -26,10 +26,10 @@ services:
 
   postgres:
     image: postgres:14
-    container_name: postgres
+    container_name: postgres-db
     environment:
       POSTGRES_DB: dj-jrd
-      POSTGRES_USER: postgres
+      POSTGRES_USER: dj-postgres
       POSTGRES_PASSWORD: Pa$$w0rd
     ports:
       - 127.0.0.1:5432:5432
@@ -41,7 +41,7 @@ services:
 
   nginx:
     build: ./nginx
-    container_name: nginx
+    container_name: nginx-webserver
     ports:
       - "80:80"
     volumes:
