@@ -8,15 +8,14 @@ services:
       volumes:
         - static_volume:/app/static
       expose:
-        - "8000"   # Map port 80 of host to port 80 of container
+        - "8000"
       environment:
-        - DJANGO_ENV=production
-        - PRODUCTION_HOST=192.168.10.10
+        - PRODUCTION_HOST=*
         - SECRET_KEY=9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m
         - DB_NAME=dj-jrd
         - DB_USER=dj-postgres
         - DB_PASSWORD=Pa$$w0rd
-        - DB_HOST=localhost
+        - DB_HOST=postgres
         - DB_PORT=5432
       restart: always
       depends_on:
@@ -31,8 +30,6 @@ services:
       POSTGRES_DB: dj-jrd
       POSTGRES_USER: dj-postgres
       POSTGRES_PASSWORD: Pa$$w0rd
-    ports:
-      - 127.0.0.1:5432:5432
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -44,6 +41,7 @@ services:
     container_name: nginx-webserver
     ports:
       - "80:80"
+    restart: always
     volumes:
       - static_volume:/usr/share/nginx/html/static
     depends_on:
