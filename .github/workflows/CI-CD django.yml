@@ -14,7 +14,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:14
         env:
           POSTGRES_DB: dj-jrd
           POSTGRES_USER: postgres
@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install -r requirements.txt
           poetry install
 
       - name: Wait for PostgreSQL to be ready
@@ -55,3 +55,70 @@ jobs:
         run: |
           poetry run python manage.py migrate
           poetry run python manage.py test
+
+      - name: Send Test Failure Notification to Discord
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{"content": "❌ Django test failed on commit: ${{ github.sha }}"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Test Success Notification to Discord
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{"content": "✅ Django tests passed successfully on commit: ${{ github.sha }}"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+
+  #   steps:
+  #     - name: Check out the repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Log in to Amazon ECR
+  #       id: ecr-login
+  #       uses: aws-actions/amazon-ecr-login@v1
+
+  #     - name: Build and push Docker image to ECR
+  #       run: |
+  #         REGION="ap-southeast-1"
+  #         ECR_REPOSITORY="my-django-app"
+  #         IMAGE_TAG="${{ github.sha }}"
+
+  #         docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+  #         docker tag $ECR_REPOSITORY:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+          
+  #         docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+
+  #     - name: Deploy to ECS
+  #       run: |
+  #         CLUSTER_NAME="my-ecs-cluster"
+  #         SERVICE_NAME="my-django-service"
+  #         TASK_FAMILY="my-task-family"
+
+  #         aws ecs update-service \
+  #           --cluster $CLUSTER_NAME \
+  #           --service $SERVICE_NAME \
+  #           --force-new-deployment
+
+      # - name: Send Deploy Success Notification to Discord
+      #   if: success()
+      #   run: |
+      #     curl -H "Content-Type: application/json" \
+      #     -X POST \
+      #     -d '{"content": "🚀 Deploy succeeded for commit: ${{ github.sha }}"}' \
+      #     ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      # - name: Send Deploy Failure Notification to Discord
+      #   if: failure()
+      #   run: |
+      #     curl -H "Content-Type: application/json" \
+      #     -X POST \
+      #     -d '{"content": "❌ Deploy failed for commit: ${{ github.sha }}"}' \
+      #     ${{ secrets.DISCORD_WEBHOOK_URL }}
