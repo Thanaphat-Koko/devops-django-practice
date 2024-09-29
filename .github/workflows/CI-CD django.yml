@@ -102,7 +102,7 @@ jobs:
           IMAGE_TAG1: django-web
           IMAGE_TAG2: nginx-web
         run: |
-          docker build -t $IMAGE_TAG2 ./nginx
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG2 ./nginx
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG2
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG2" >> $GITHUB_OUTPUT
 
