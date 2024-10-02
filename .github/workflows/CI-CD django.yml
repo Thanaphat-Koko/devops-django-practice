@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - prod_test
   pull_request:
     branches:
       - main
@@ -59,6 +58,14 @@ jobs:
   #         poetry run python manage.py migrate
   #         poetry run python manage.py test
 
+  #     - name: Send Test Success Notification to Discord
+  #       if: success()
+  #       run: |
+  #         curl -H "Content-Type: application/json" \
+  #         -X POST \
+  #         -d '{"content": "✅ Django tests passed successfully on commit: ${{ github.sha }}"}' \
+          # ${{ secrets.DISCORD_WEBHOOK_URL }}
+
   #     - name: Send Test Failure Notification to Discord
   #       if: failure()
   #       run: |
@@ -67,13 +74,6 @@ jobs:
   #         -d '{"content": "❌ Django test failed on commit: ${{ github.sha }}"}' \
   #         ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-  #     - name: Send Test Success Notification to Discord
-  #       if: success()
-  #       run: |
-  #         curl -H "Content-Type: application/json" \
-  #         -X POST \
-  #         -d '{"content": "✅ Django tests passed successfully on commit: ${{ github.sha }}"}' \
-          # ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   Build_and_Push:
       name: Build_and_Push

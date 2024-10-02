@@ -37,7 +37,7 @@ services:
       - dj
 
   nginx:
-    build: ./nginx
+    build: .
     container_name: nginx-webserver
     ports:
       - "80:80"

@@ -13,8 +13,10 @@ COPY . /app/
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    libpq-dev gcc python3-dev build-essential
+    libpq-dev gcc python3-dev build-essential \
+    apt install nginx -y
 
+COPY ./app/nginx/nginx.conf /etc/nginx/nginx.conf
 RUN pip install --no-cache-dir -r requirements.txt
 RUN poetry install
 RUN poetry run python manage.py collectstatic --noinput
