@@ -1,5 +1,3 @@
-# Dockerfile
-
 # Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
@@ -12,12 +10,10 @@ WORKDIR /app
 COPY . /app/
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    libpq-dev gcc python3-dev build-essential \
-    apt install nginx -y
+RUN apt-get update && apt-get install -y libpq-dev gcc python3-dev build-essential
 
-COPY ./app/nginx/nginx.conf /etc/nginx/nginx.conf
 RUN pip install --no-cache-dir -r requirements.txt
 RUN poetry install
-RUN poetry run python manage.py collectstatic --noinput
 
+EXPOSE 80
+RUN poetry run python manage.py collectstatic --noinput
