@@ -1,0 +1,79 @@
+{
+    "family": "devops-learning4",
+    "containerDefinitions": [
+        {
+            "name": "django-web",
+            "image": "315012813490.dkr.ecr.ap-southeast-1.amazonaws.com/devops-django2:django-web",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "django-80-tcp",
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "command": [
+                "./run.sh"
+            ],
+            "environment": [
+                {
+                    "name": "PRODUCTION_HOST",
+                    "value": "*"
+                },
+                {
+                    "name": "DB_PORT",
+                    "value": "5432"
+                },
+                {
+                    "name": "DB_USER",
+                    "value": "djpostgres"
+                },
+                {
+                    "name": "SECRET_KEY",
+                    "value": "9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m"
+                },
+                {
+                    "name": "DB_NAME",
+                    "value": "dj_db"
+                },
+                {
+                    "name": "DB_HOST",
+                    "value": "dj-posgres-db.cdc088682n8d.ap-southeast-1.rds.amazonaws.com"
+                },
+                {
+                    "name": "DB_PASSWORD",
+                    "value": "Dj-postgres123"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "workingDirectory": "/app",
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/devops-learning",
+                    "mode": "non-blocking",
+                    "awslogs-create-group": "true",
+                    "max-buffer-size": "25m",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "systemControls": []
+        }
+    ],
+    "executionRoleArn": "arn:aws:iam::315012813490:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    }
+}
