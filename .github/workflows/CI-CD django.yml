@@ -113,6 +113,7 @@ jobs:
 
   Deploy:
     needs: [Build_and_Push, Test]
+    runs-on: ubuntu-latest
     steps:
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
