@@ -80,8 +80,8 @@ jobs:
   #         ${{ secrets.DISCORD_WEBHOOK_URL }}
 
 
-  Build_and_Push:
-      name: Build_and_Push
+  Build_and_Deploy:
+      name: Build_and_Deploy
       runs-on: ubuntu-latest
       #needs: Test
 
@@ -110,20 +110,13 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG1
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG1" >> $GITHUB_OUTPUT
 
-        outputs:
-            image: ${{ steps.build-and-push-image.outputs.image }}
-
-  Deploy:
-    needs: [Build_and_Push]
-    runs-on: ubuntu-latest
-    steps:
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1.1.2
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ needs.Build_and_Push.outputs.image }}
+          image: ${{ steps.build-and-push-image.outputs.image }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
