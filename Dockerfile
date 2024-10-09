@@ -17,3 +17,4 @@ RUN poetry install
 
 EXPOSE 80
 RUN poetry run python manage.py collectstatic --noinput
+RUN chmod +x ./run.sh
