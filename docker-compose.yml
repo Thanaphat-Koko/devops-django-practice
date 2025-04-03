@@ -4,7 +4,7 @@ services:
   django:
       container_name: django-webserver
       build: .
-      command: poetry run gunicorn project_jrd.wsgi:application --bind 0.0.0.0:8000
+      # command: poetry run gunicorn project_jrd.wsgi:application --bind 0.0.0.0:8000
       volumes:
         - static_volume:/app/static
       expose:
