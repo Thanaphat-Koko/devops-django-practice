@@ -30,8 +30,8 @@ services:
     container_name: postgres-db
     environment:
       POSTGRES_DB: dj-jrd
-      POSTGRES_USER: dj-postgres
-      POSTGRES_PASSWORD: Pa$$w0rd
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -51,8 +51,24 @@ services:
     networks:
       - dj
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: PGadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@junraider.com
+      PGADMIN_DEFAULT_PASSWORD: 123456789
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - dj
+
 volumes:
   postgres_data:
   static_volume:
+  pgadmin_data:
 networks:
   dj:
