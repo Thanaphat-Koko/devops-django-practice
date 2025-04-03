@@ -4,7 +4,7 @@ services:
   django:
       container_name: django-webserver
       build: .
-      command: poetry show
+      command: ["sh", "./run_server.sh"]
       volumes:
         - static_volume:/app/static
       expose:
