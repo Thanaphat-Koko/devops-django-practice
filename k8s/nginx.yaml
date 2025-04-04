@@ -1,0 +1,43 @@
+# Nginx Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1  # Adjust as needed
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest  # Replace with your actual nginx image or use the Dockerfile from nginx folder
+        imagePullPolicy: IfNotPresent  # Change if using remote registry
+        ports:
+        - containerPort: 80
+      #   volumeMounts:
+      #   - name: static-volume
+      #     mountPath: /usr/share/nginx/html/static
+      # volumes:
+      # - name: static-volume
+      #   persistentVolumeClaim:
+      #     claimName: static-volume-pvc
+
+---
+# Nginx Service (with LoadBalancer to expose it externally)
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
