@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev gcc python3-dev build-essential
 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN poetry install
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+RUN poetry install --no-root
 # RUN poetry run python manage.py migrate
 # RUN poetry run python manage.py collectstatic --noinput
 

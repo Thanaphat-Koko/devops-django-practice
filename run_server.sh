@@ -4,6 +4,9 @@ echo "Show library list................................."
 poetry show
 echo "Check environment info............................"
 poetry env info
+echo "Run which poetry................................"
+poetry run which poetry
+poetry --version
 echo "Run show gunicorn................................."
 poetry show gunicorn
 echo "Run which gunicorn................................"
