@@ -12,5 +12,4 @@ poetry show gunicorn
 echo "Run which gunicorn................................"
 poetry run which gunicorn
 echo "Run Server........................................"
-poetry shell
-gunicorn project_jrd.wsgi:application --bind 0.0.0.0:8000
+poetry run gunicorn project_jrd.wsgi:application --bind 0.0.0.0:8000
