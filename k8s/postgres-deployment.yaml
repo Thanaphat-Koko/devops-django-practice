@@ -1,3 +1,16 @@
+# Secret for PostgreSQL credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+data:
+  # Base64 encoded values
+  POSTGRES_USER: cG9zdGdyZXM=  # 'postgres' encoded
+  POSTGRES_PASSWORD: MTIzNDU2  # '123456' encoded
+  POSTGRES_DB: ZGotanJk  # 'dj-jrd' encoded
+
+---
 # PostgreSQL Deployment
 apiVersion: apps/v1
 kind: Deployment

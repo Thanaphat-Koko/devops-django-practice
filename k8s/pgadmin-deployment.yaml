@@ -50,10 +50,11 @@ metadata:
 spec:
   selector:
     app: pgadmin
+  type: NodePort
   ports:
-  - port: 5050
-    targetPort: 80
-  type: ClusterIP  # Change to LoadBalancer or use Ingress if needed
+    - port: 5050
+      targetPort: 80
+      nodePort: 30050
 
 ---
 # PersistentVolumeClaim for PGAdmin data

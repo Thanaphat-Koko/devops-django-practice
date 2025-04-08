@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-config
+data:
+  # Add your environment variables from .env file here
+  # Example:
+  # DATABASE_URL: "postgres://postgres:123456@postgres-service:5432/dj-jrd"
+  PRODUCTION_HOST: "*"
+  SECRET_KEY: "9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m"
+  DB_NAME: "dj-jrd"
+  DB_USER: "postgres"
+  DB_PASSWORD: "123456"
+  DB_HOST: "postgres"
+  DB_PORT: "5432"
+
+--- 
+# Django Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-deployment
+spec:
+  replicas: 1  # Adjust as needed
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+      - name: django
+        image: infinitekj/devops-django-web-app:lates  # Replace with your actual image or use the Dockerfile from your docker-compose
+        imagePullPolicy: IfNotPresent  # Change if using remote registry
+        command: ["sh", "./run_server.sh"]
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: django-config
+        volumeMounts:
+        - name: static-volume
+          mountPath: /app/static
+      volumes:
+      - name: static-volume
+        persistentVolumeClaim:
+          claimName: static-volume-pvc
+      initContainers:
+      - name: django-init
+        image: infinitekj/devops-django-web-app:lates
+        command: ['sh', '-c', 'poetry run python manage.py collectstatic --noinput']
+        volumeMounts:
+        - name: static-volume
+          mountPath: /app/static
+        envFrom:
+        - configMapRef:
+            name: django-config
+
+---
+# Django Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-service
+spec:
+  selector:
+    app: django
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP  # Change to LoadBalancer if you want to expose it externally
+  #   nodePort: 30180
+  # type: NodePort
+
+---
+# PersistentVolumeClaim for static files
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: static-volume-pvc
+spec:
+  accessModes:
+    - ReadWriteMany  # Need ReadWriteMany for sharing between pods
+  resources:
+    requests:
+      storage: 1Gi  # Adjust size as needed
