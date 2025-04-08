@@ -33,9 +33,10 @@ DEBUG = os.getenv("DEBUG") == "True"
 production_host = os.getenv("PRODUCTION_HOST")
 ALLOWED_HOSTS = [production_host] if production_host is not None else []
 
+csrf_trust_origin = os.getenv("CSRF_TRUST_ORIGIN")
+CSRF_TRUSTED_ORIGINS = [csrf_trust_origin] if csrf_trust_origin is not None else []
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

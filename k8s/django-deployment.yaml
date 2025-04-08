@@ -3,15 +3,14 @@ kind: ConfigMap
 metadata:
   name: django-config
 data:
-  # Add your environment variables from .env file here
-  # Example:
-  # DATABASE_URL: "postgres://postgres:123456@postgres-service:5432/dj-jrd"
+  DEBUG: "True"
+  CSRF_TRUST_ORIGIN: "http://192.168.49.2:30080"
   PRODUCTION_HOST: "*"
   SECRET_KEY: "9dvw5lrq60i!0t11-=()5oljq6-cwb1gqsg47yk@z6qdgjri)m"
   DB_NAME: "dj-jrd"
   DB_USER: "postgres"
   DB_PASSWORD: "123456"
-  DB_HOST: "postgres"
+  DB_HOST: "postgres-service"
   DB_PORT: "5432"
 
 --- 
@@ -32,7 +31,7 @@ spec:
     spec:
       containers:
       - name: django
-        image: infinitekj/devops-django-web-app:lates  # Replace with your actual image or use the Dockerfile from your docker-compose
+        image: infinitekj/devops-django-web-app:latest  # Replace with your actual image or use the Dockerfile from your docker-compose
         imagePullPolicy: IfNotPresent  # Change if using remote registry
         command: ["sh", "./run_server.sh"]
         ports:
@@ -49,7 +48,7 @@ spec:
           claimName: static-volume-pvc
       initContainers:
       - name: django-init
-        image: infinitekj/devops-django-web-app:lates
+        image: infinitekj/devops-django-web-app:latest
         command: ['sh', '-c', 'poetry run python manage.py collectstatic --noinput']
         volumeMounts:
         - name: static-volume
