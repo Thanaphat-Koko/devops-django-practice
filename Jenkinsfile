@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_REGISTRY = credentials('DOCKER_REGISTRY')
-        DOCKER_CREDENTIALS = credentials('DOCKER_HUB_CREDENTIALS')
+        // DOCKER_CREDENTIALS = credentials('DOCKER_HUB_CREDENTIALS')
         DJANGO_IMAGE_NAME = 'devops-django-web-app'
         NGINX_IMAGE_NAME = 'nginx-django-web-app'
         DOCKER_IMAGE_TAG = credentials('DOCKER_IMAGE_TAG')
@@ -17,29 +17,33 @@ pipeline {
             }
         }
 
-        // stage('Build Docker Images') {
-        //     steps {
-        //         echo "Build Django Web Image............."
-        //         sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-        //         echo "Build Nginx Web Image............."
-        //         sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./nginx/"
-        //     }
-        // }
-
-        stage('Push Docker Image') {
+        stage('Build & Push Nginx Images') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USR')]) {
-                        echo "Login To Docker Hub............."
-                        sh "docker login ${DOCKER_REGISTRY} -u $DOCKER_USR -p $DOCKER_PASS"
-                        echo "Push Docker Image............."
-                        sh "docker push ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-                        sh "docker push ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                    withDockerRegistry(credentialsId: 'DOCKER_HUB_CREDENTIALS', url: 'https://hub.docker.com/r/infinitekj/nginx-django-web-app') {
+                        // echo "Build Django Web Image............."
+                        // sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                        echo "Build & push Nginx Web Image............."
+                        sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./nginx/"
+                        sh "docker push"
                     }
                 }
-
             }
         }
+
+        // stage('Push Docker Image') {
+        //     steps {
+        //         script {
+        //             withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USR')]) {
+        //                 echo "Login To Docker Hub............."
+        //                 sh "docker login ${DOCKER_REGISTRY} -u $DOCKER_USR -p $DOCKER_PASS"
+        //                 echo "Push Docker Image............."
+        //                 sh "docker push ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+        //                 sh "docker push ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+        //             }
+        //         }
+        //     }
+        // }
         
     //     stage('Run MiniKube') {
     //         steps {
