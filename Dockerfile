@@ -9,15 +9,17 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-COPY . /app/
+COPY . .
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     libpq-dev gcc python3-dev build-essential
 
 RUN pip install --no-cache-dir -r requirements.txt
+
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
-RUN poetry install --no-root
+
+RUN poetry install --no-root -v
 # RUN poetry run python manage.py migrate
 # RUN poetry run python manage.py collectstatic --noinput
 
