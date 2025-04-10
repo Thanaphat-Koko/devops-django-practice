@@ -17,15 +17,24 @@ pipeline {
             }
         }
 
-        stage('Build & Push Nginx Images') {
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Build Django Web Image............."
+                // sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                echo "Build Nginx Web Image............."
+                // sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./nginx/"
+            }
+        }
+
+        stage('Push Docker Images') {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'DOCKER_HUB_CREDENTIALS') {
-                        // echo "Build Django Web Image............."
-                        // sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-                        echo "Build & push Nginx Web Image............."
-                        sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./nginx/"
-                        sh "docker push"
+                        echo "Push Django Web Image............."
+                        sh "docker push ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                        echo "Push Nginx Web Image............."
+                        sh "docker push ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                     }
                 }
             }
