@@ -47,7 +47,7 @@ pipeline {
     //             sh "./run-k8s.sh"
     //         }
     //     }
-    // }
+    }
 
     post {
         success {
