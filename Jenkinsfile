@@ -22,7 +22,7 @@ pipeline {
                 echo "Build Django Web Image............."
                 sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 echo "Build Nginx Web Image............."
-                sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ../nginx"
+                sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./nginx/"
             }
         }
 
