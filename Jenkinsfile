@@ -20,7 +20,7 @@ pipeline {
         stage('Build & Push Nginx Images') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'DOCKER_HUB_CREDENTIALS', url: 'https://hub.docker.com/r/infinitekj/nginx-django-web-app') {
+                    withDockerRegistry(credentialsId: 'DOCKER_HUB_CREDENTIALS') {
                         // echo "Build Django Web Image............."
                         // sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                         echo "Build & push Nginx Web Image............."
