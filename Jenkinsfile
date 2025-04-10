@@ -17,18 +17,18 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                echo "Build Django Web Image............."
-                sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-                echo "Build Nginx Web Image............."
-                sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./nginx/"
-            }
-        }
+        // stage('Build Docker Images') {
+        //     steps {
+        //         echo "Build Django Web Image............."
+        //         sh "docker build -t ${DOCKER_REGISTRY}/${DJANGO_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+        //         echo "Build Nginx Web Image............."
+        //         sh "docker build -t ${DOCKER_REGISTRY}/${NGINX_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ./nginx/"
+        //     }
+        // }
 
         stage('Push Docker Image') {
             steps {
-                scripts {
+                script {
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS}", passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USR')]) {
                         echo "Login To Docker Hub............."
                         sh "docker login ${DOCKER_REGISTRY} -u $DOCKER_USR -p $DOCKER_PASS"
