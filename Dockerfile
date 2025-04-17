@@ -1,7 +1,7 @@
 # Dockerfile
 
 # Use an official Python runtime as a parent image
-FROM python:3.12-slim
+FROM python:3.12.10-alpine3.21
 
 ENV PYTHONUNBUFFERED 1
 
@@ -12,12 +12,14 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    libpq-dev gcc python3-dev build-essential
+RUN apk update && apk add --no-cache \
+    libpq-dev gcc python3-dev build-base
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+
+RUN poetry update
 
 RUN poetry install --no-root -v
 # RUN poetry run python manage.py migrate
