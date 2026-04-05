@@ -1,0 +1,78 @@
+services:
+  django:
+      container_name: django-webserver
+      build: .
+      command: ["sh", "./run_server.sh"]
+      volumes:
+        - static_volume:/app/static
+      expose:
+        - "8000"
+      env_file:
+        - .env
+      restart: always
+      depends_on:
+        - postgres
+      networks:
+        - dj
+
+  postgres:
+    image: postgres:14
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: dj-jrd
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dj
+
+  nginx:
+    build: ./nginx
+    container_name: nginx-webserver
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - static_volume:/usr/share/nginx/html/static
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
+    depends_on:
+      - django
+    networks:
+      - dj
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - certbot_www:/var/www/certbot:rw
+      - certbot_conf:/etc/letsencrypt:rw
+    networks:
+      - dj
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: PGadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@junraider.com
+      PGADMIN_DEFAULT_PASSWORD: 123456789
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - dj
+
+volumes:
+  postgres_data:
+  static_volume:
+  pgadmin_data:
+  certbot_www:
+  certbot_conf:
+networks:
+  dj:

@@ -1,0 +1,156 @@
+---
+# =============================================================================
+# SSL Role - Tasks
+# Handles: certbot install, cert obtain/replace/renew, nginx config, auto-renewal
+# =============================================================================
+
+# ---- Install Certbot ----
+- name: Install Certbot and dependencies
+  tags: [install, obtain, replace]
+  apt:
+    name:
+      - certbot
+      - python3-certbot-nginx
+    state: present
+    update_cache: yes
+
+# ---- Prepare directories ----
+- name: Create webroot directory for ACME challenge
+  tags: [obtain, replace]
+  file:
+    path: "{{ webroot_path }}"
+    state: directory
+    mode: "0755"
+
+- name: Create backup directory for certificates
+  tags: [obtain, replace]
+  file:
+    path: "{{ backup_dir }}"
+    state: directory
+    mode: "0700"
+
+# ---- Update docker-compose.yml ----
+- name: Update docker-compose.yml with SSL support
+  tags: [obtain, replace, configure]
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ project_dir }}/docker-compose.yml"
+    backup: yes
+    mode: "0644"
+
+# ---- Configure nginx for HTTP (ACME challenge) ----
+- name: Deploy nginx HTTP config (for initial cert acquisition)
+  tags: [obtain, replace]
+  template:
+    src: nginx_http.conf.j2
+    dest: "{{ project_dir }}/nginx/nginx.conf"
+    mode: "0644"
+
+- name: Rebuild and restart nginx (HTTP mode)
+  tags: [obtain, replace]
+  command: docker compose up -d --build nginx
+  args:
+    chdir: "{{ project_dir }}"
+
+- name: Wait for nginx to be ready
+  tags: [obtain, replace]
+  pause:
+    seconds: 5
+
+# ---- Backup existing certificate (for replace) ----
+- name: Check if existing certificate exists
+  tags: [replace]
+  stat:
+    path: "{{ cert_path }}/cert.pem"
+  register: existing_cert
+
+- name: Backup existing certificate
+  tags: [replace]
+  copy:
+    src: "{{ cert_path }}/"
+    dest: "{{ backup_dir }}/cert_backup_{{ ansible_date_time.iso8601_basic_short }}/"
+    remote_src: yes
+  when: existing_cert.stat.exists | default(false)
+
+- name: Revoke existing certificate
+  tags: [replace]
+  command: >
+    docker compose run --rm certbot revoke
+    --cert-path /etc/letsencrypt/live/{{ domain }}/cert.pem
+    --non-interactive
+  args:
+    chdir: "{{ project_dir }}"
+  when: existing_cert.stat.exists | default(false)
+  ignore_errors: yes
+
+# ---- Obtain SSL Certificate ----
+- name: Obtain SSL certificate from Let's Encrypt
+  tags: [obtain, replace]
+  command: >
+    docker compose run --rm certbot certonly
+    --webroot
+    --webroot-path=/var/www/certbot
+    --email {{ email }}
+    --agree-tos
+    --no-eff-email
+    --force-renewal
+    -d {{ domain }}
+  args:
+    chdir: "{{ project_dir }}"
+  register: certbot_result
+
+- name: Display certbot output
+  tags: [obtain, replace]
+  debug:
+    var: certbot_result.stdout_lines
+
+# ---- Configure nginx for HTTPS ----
+- name: Deploy nginx HTTPS config
+  tags: [obtain, replace, configure]
+  template:
+    src: nginx_https.conf.j2
+    dest: "{{ project_dir }}/nginx/nginx.conf"
+    mode: "0644"
+
+- name: Rebuild and restart nginx (HTTPS mode)
+  tags: [obtain, replace, configure]
+  command: docker compose up -d --build nginx
+  args:
+    chdir: "{{ project_dir }}"
+  notify: reload nginx
+
+# ---- Renew Certificate ----
+- name: Renew SSL certificate
+  tags: [renew]
+  command: docker compose run --rm certbot renew
+  args:
+    chdir: "{{ project_dir }}"
+  register: renew_result
+  notify: reload nginx
+
+- name: Display renewal output
+  tags: [renew]
+  debug:
+    var: renew_result.stdout_lines
+  when: renew_result is defined
+
+# ---- Set up auto-renewal via cron ----
+- name: Set up automatic certificate renewal cron job
+  tags: [obtain, replace, cron]
+  cron:
+    name: "Renew Let's Encrypt SSL certificate"
+    minute: "0"
+    hour: "3"
+    job: "cd {{ project_dir }} && docker compose run --rm certbot renew --quiet && docker compose exec nginx nginx -s reload"
+    user: root
+
+- name: Display completion summary
+  tags: [obtain, replace]
+  debug:
+    msg: |
+      ✅ SSL setup complete for {{ domain }}
+      - HTTPS: https://{{ domain }}
+      - HTTP redirects to HTTPS automatically
+      - Auto-renewal: daily at 3:00 AM
+      - Certificate path: {{ cert_path }}
+      - Backup directory: {{ backup_dir }}

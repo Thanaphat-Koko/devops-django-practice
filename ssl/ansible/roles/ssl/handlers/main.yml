@@ -1,0 +1,7 @@
+---
+# Handlers for the SSL role
+
+- name: reload nginx
+  command: docker compose exec nginx nginx -s reload
+  args:
+    chdir: "{{ project_dir }}"

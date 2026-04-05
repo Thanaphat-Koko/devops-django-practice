@@ -11,5 +11,9 @@ echo "Run show gunicorn................................."
 poetry show gunicorn
 echo "Run which gunicorn................................"
 poetry run which gunicorn
+echo "Run Migrate........................................"
+poetry run python manage.py migrate --noinput
+echo "Run CollectStatic.................................."
+poetry run python manage.py collectstatic --noinput
 echo "Run Server........................................"
 poetry run gunicorn project_jrd.wsgi:application --bind 0.0.0.0:8000
