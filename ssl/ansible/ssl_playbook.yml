@@ -23,9 +23,10 @@
     domain: "thanappe.infinix-lab.com"
     email: "admin@infinix-lab.com"
     project_dir: "/home/thanaphat_peth/Desktops/devops-django-practice"
+    ssl_dir: "{{ project_dir }}/ssl"
     webroot_path: "/var/www/certbot"
     cert_path: "/etc/letsencrypt/live/{{ domain }}"
-    backup_dir: "{{ project_dir }}/ssl_backups"
+    backup_dir: "{{ ssl_dir }}/ssl_backups"
     nginx_container: "nginx-webserver"
 
   roles:

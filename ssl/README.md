@@ -17,21 +17,22 @@ Enable HTTPS for `thanappe.infinix-lab.com` using **Let's Encrypt** with two aut
 
 ```
 devops-django-practice/
-├── setup_https.sh              # Task 2.1 — Bash automation script
 ├── docker-compose.yml
 ├── nginx/
 │   └── nginx.conf
-├── ansible/                    # Task 2.2 — Ansible automation
-│   ├── inventory.ini
-│   ├── ssl_playbook.yml
-│   └── roles/ssl/
-│       ├── tasks/main.yml
-│       ├── handlers/main.yml
-│       └── templates/
-│           ├── nginx_https.conf.j2
-│           ├── nginx_http.conf.j2
-│           └── docker-compose.yml.j2
-└── ...
+└── ssl/                                # SSL automation directory
+    ├── README.md                       # This file
+    ├── setup_https.sh                  # Task 2.1 — Bash automation script
+    └── ansible/                        # Task 2.2 — Ansible automation
+        ├── inventory.ini
+        ├── ssl_playbook.yml
+        └── roles/ssl/
+            ├── tasks/main.yml
+            ├── handlers/main.yml
+            └── templates/
+                ├── nginx_https.conf.j2
+                ├── nginx_http.conf.j2
+                └── docker-compose.yml.j2
 ```
 
 ---
@@ -41,6 +42,8 @@ devops-django-practice/
 ### First-Time Setup
 
 ```bash
+cd ~/Desktops/devops-django-practice/ssl
+
 # Make executable (one time)
 chmod +x setup_https.sh
 
@@ -60,6 +63,8 @@ This single command will:
 ### Other Commands
 
 ```bash
+cd ~/Desktops/devops-django-practice/ssl
+
 # Renew existing certificate
 sudo ./setup_https.sh renew
 
@@ -83,7 +88,7 @@ sudo ./setup_https.sh status
 
 2. Edit the inventory if needed:
    ```ini
-   # ansible/inventory.ini
+   # ssl/ansible/inventory.ini
    [webservers]
    thanappe.infinix-lab.com ansible_user=thanaphat_peth ansible_become=yes
    ```
@@ -93,6 +98,8 @@ sudo ./setup_https.sh status
 ### Usage
 
 ```bash
+cd ~/Desktops/devops-django-practice/ssl
+
 # First-time HTTPS setup
 ansible-playbook -i ansible/inventory.ini ansible/ssl_playbook.yml --tags obtain
 
@@ -152,8 +159,8 @@ Client (Browser)
 |------|------|
 | Certificate | `/etc/letsencrypt/live/thanappe.infinix-lab.com/fullchain.pem` |
 | Private Key | `/etc/letsencrypt/live/thanappe.infinix-lab.com/privkey.pem` |
-| Backups | `./ssl_backups/` |
-| Logs | `./ssl_setup.log` |
+| Backups | `ssl/ssl_backups/` |
+| Logs | `ssl/ssl_setup.log` |
 
 ---
 
@@ -172,6 +179,7 @@ curl -I http://thanappe.infinix-lab.com
 openssl s_client -connect thanappe.infinix-lab.com:443 -brief
 
 # Check certificate expiry
+cd ~/Desktops/devops-django-practice/ssl
 sudo ./setup_https.sh status
 ```
 

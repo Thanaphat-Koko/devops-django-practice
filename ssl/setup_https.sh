@@ -23,10 +23,11 @@ EMAIL="admin@infinix-lab.com"
 WEBROOT_PATH="/var/www/certbot"
 CERT_PATH="/etc/letsencrypt/live/${DOMAIN}"
 NGINX_CONTAINER="nginx-webserver"
-COMPOSE_DIR="$(cd "$(dirname "$0")" && pwd)"
+SSL_DIR="$(cd "$(dirname "$0")" && pwd)"
+COMPOSE_DIR="$(cd "${SSL_DIR}/.." && pwd)"
 NGINX_CONF="${COMPOSE_DIR}/nginx/nginx.conf"
-BACKUP_DIR="${COMPOSE_DIR}/ssl_backups"
-LOG_FILE="${COMPOSE_DIR}/ssl_setup.log"
+BACKUP_DIR="${SSL_DIR}/ssl_backups"
+LOG_FILE="${SSL_DIR}/ssl_setup.log"
 
 # ---- Colors ----
 RED='\033[0;31m'
